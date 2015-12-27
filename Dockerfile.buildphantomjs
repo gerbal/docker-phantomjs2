@@ -1,6 +1,8 @@
 # Based on https://github.com/rosenhouse/phantomjs2/blob/1df72b25bc231693c3d059d71ec40cd6e27d6872/Dockerfile
 FROM ubuntu:14.04
 
+ENV phantom_version 1.9.8
+
 # Dependencies we just need for building phantomjs
 ENV buildDependencies\
   wget unzip python build-essential g++ flex bison gperf\
@@ -14,17 +16,18 @@ ENV phantomJSDependencies\
 RUN \
     # Installing dependencies
     apt-get update -yqq \
-&&  apt-get install -fyqq ${buildDependencies} ${phantomJSDependencies}\
+&&  apt-get install -fyqq ${buildDependencies} ${phantomJSDependencies}
     # Downloading src, unzipping & removing zip
-&&  mkdir phantomjs \
+
+RUN mkdir phantomjs \
 &&  cd phantomjs \
-&&  wget https://github.com/ariya/phantomjs/archive/54a54dc0687a4b93562285d4f632dcafe2c7bf4f.zip -O phantomjs.zip \
-&&  unzip phantomjs.zip \
-&&  rm -rf /phantomjs/phantomjs.zip \
+&&  wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-${phantom_version}-linux-x86_64.tar.bz2 -O phantomjs.tar.bz2 \
+&&  tar -xjvf phantomjs.tar.bz2 \
+&&  rm -rf /phantomjs/phantomjs.tar.bz2 \
     # Building phantom
 &&  mv phantomjs-* phantomjs \
 &&  cd phantomjs \
-&&  ./build.sh --confirm --silent \
+# &&  ./build.sh --confirm --silent \
     # Removing everything but the binary
 &&  ls -A | grep -v bin | xargs rm -rf \
     # Symlink phantom so that we are able to run `phantomjs`
